@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Exercise } from '../types';
+import { triggerFeedback } from '../utils/feedback';
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -21,6 +22,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   variant = 'main'
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleToggleWrapper = () => {
+    // Play "Ding" sound only when checking (optional preference, but good for positive reinforcement)
+    // Or play for both check/uncheck. We'll play "success" for both to indicate interaction.
+    triggerFeedback('success'); 
+    onToggle();
+  };
 
   // Logic to determine if target was met
   const isTargetMet = (() => {
@@ -86,9 +94,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         </div>
         <button
-          onClick={onToggle}
+          onClick={handleToggleWrapper}
           className={`
-            w-8 h-8 rounded flex items-center justify-center transition-colors
+            w-8 h-8 rounded flex items-center justify-center transition-colors active:scale-95
             ${isDone ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-600 hover:bg-slate-700'}
           `}
         >

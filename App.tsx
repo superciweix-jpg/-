@@ -10,7 +10,8 @@ import ProfileView from './components/ProfileView';
 import DataView from './components/DataView';
 
 import { WEEKLY_PLAN } from './constants';
-import { DailyPlan, WorkoutLog, Exercise, HistoryRecord } from './types';
+import { WorkoutLog, Exercise, HistoryRecord } from './types';
+import { triggerFeedback } from './utils/feedback';
 
 // Helper: Get dates for the current week (Monday to Sunday)
 const getWeekDates = () => {
@@ -35,64 +36,96 @@ type TabType = 'training' | 'history' | 'data' | 'profile';
 type TrainingViewState = 'dashboard' | 'workout';
 
 const App: React.FC = () => {
-  // Global App State
-  const [activeTab, setActiveTab] = useState<TabType>('training');
+  // --- 1. State Initialization (STRICT LAZY INIT PATTERN) ---
   
-  // Training Tab Specific State
+  // App View State
+  const [activeTab, setActiveTab] = useState<TabType>('training');
   const [trainingView, setTrainingView] = useState<TrainingViewState>('dashboard');
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(new Date().getDay()); 
-  
-  // Data State
-  const [log, setLog] = useState<WorkoutLog>({});
-  const [history, setHistory] = useState<HistoryRecord[]>([]);
 
-  // UI State
+  // Data: Workout Log & Progress
+  const [log, setLog] = useState<WorkoutLog>(() => {
+    try {
+      const stored = localStorage.getItem('fitness-app-v1-log');
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error("Failed to load log", e);
+      return {};
+    }
+  });
+
+  // Data: History Records
+  const [history, setHistory] = useState<HistoryRecord[]>(() => {
+    try {
+      const stored = localStorage.getItem('fitness-app-v1-history');
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Failed to load history", e);
+      return [];
+    }
+  });
+
+  // UI Local State
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [showEpicOverlay, setShowEpicOverlay] = useState(false);
   const [statsDuration, setStatsDuration] = useState('');
   const [statsCalories, setStatsCalories] = useState('');
 
-  // Memoized Dates
-  const weekDates = useMemo(() => getWeekDates(), []);
-  
-  // Derived State
-  const activeDateString = weekDates[selectedDayIndex];
-  const currentPlan = WEEKLY_PLAN[selectedDayIndex];
+  // --- 2. Persistence Side Effects (Strict Sync) ---
 
-  // Initialize Data
   useEffect(() => {
-    const storedLog = localStorage.getItem('fitness-app-v1-log');
-    if (storedLog) setLog(JSON.parse(storedLog));
-    
-    const storedHistory = localStorage.getItem('fitness-app-v1-history');
-    if (storedHistory) setHistory(JSON.parse(storedHistory));
-  }, []);
-
-  // Persistence
-  useEffect(() => {
-    localStorage.setItem('fitness-app-v1-log', JSON.stringify(log));
+    try {
+      localStorage.setItem('fitness-app-v1-log', JSON.stringify(log));
+    } catch (e) {
+      console.error("Failed to save log", e);
+    }
   }, [log]);
   
   useEffect(() => {
-    localStorage.setItem('fitness-app-v1-history', JSON.stringify(history));
+    try {
+      localStorage.setItem('fitness-app-v1-history', JSON.stringify(history));
+    } catch (e) {
+      console.error("Failed to save history", e);
+    }
   }, [history]);
 
-  // --- Handlers ---
+  // --- 3. Derived State ---
+  
+  const weekDates = useMemo(() => getWeekDates(), []);
+  const activeDateString = weekDates[selectedDayIndex];
+  const currentPlan = WEEKLY_PLAN[selectedDayIndex];
+
+  // --- 4. Handlers ---
+
+  const handleTabSelect = (tab: TabType) => {
+    if (tab !== activeTab) {
+      triggerFeedback('light'); // Mechanical Click
+      setActiveTab(tab);
+    }
+  };
 
   const handleDaySelect = (dayIndex: number) => {
+    triggerFeedback('light'); // Mechanical Click
     setSelectedDayIndex(dayIndex);
     setTrainingView('workout');
   };
 
+  // Note: Sound for toggle is handled in ExerciseCard component for immediate feedback
   const handleToggle = (exerciseId: string) => {
     setLog(prev => {
       const dailyLog = prev[activeDateString] || { completed: false, exercises: {} };
       const currentExState = dailyLog.exercises[exerciseId] || { done: false, weight: '', reps: '' };
+      
+      const newDoneState = !currentExState.done;
+      
       return {
         ...prev,
         [activeDateString]: {
           ...dailyLog,
-          exercises: { ...dailyLog.exercises, [exerciseId]: { ...currentExState, done: !currentExState.done } }
+          exercises: { 
+            ...dailyLog.exercises, 
+            [exerciseId]: { ...currentExState, done: newDoneState } 
+          }
         }
       };
     });
@@ -106,18 +139,24 @@ const App: React.FC = () => {
         ...prev,
         [activeDateString]: {
           ...dailyLog,
-          exercises: { ...dailyLog.exercises, [exerciseId]: { ...currentExState, [field]: val } }
+          exercises: { 
+            ...dailyLog.exercises, 
+            [exerciseId]: { ...currentExState, [field]: val } 
+          }
         }
       };
     });
   };
 
   const initiateFinish = () => {
+    triggerFeedback('light');
     setShowFinishModal(true);
   };
 
   const confirmFinish = () => {
-    // 1. Update Log (Weekly Grid Status)
+    triggerFeedback('success'); // Big achievement sound
+    
+    // 1. Update Log Status
     setLog(prev => ({
       ...prev,
       [activeDateString]: { 
@@ -133,7 +172,7 @@ const App: React.FC = () => {
       id: Date.now().toString(),
       date: activeDateString,
       dayName: currentPlan.dayName,
-      title: currentPlan.focus.split('(')[0], // Simplified title
+      title: currentPlan.focus.split('(')[0],
       duration: statsDuration || '0',
       calories: statsCalories || '0',
       completedAt: Date.now()
@@ -141,21 +180,21 @@ const App: React.FC = () => {
     
     setHistory(prev => [newRecord, ...prev]);
 
-    // 3. UI Feedback
+    // 3. UI Flow
     setShowFinishModal(false);
     setShowEpicOverlay(true);
   };
 
   const handleDismissEpicOverlay = () => {
+    triggerFeedback('light');
     setShowEpicOverlay(false);
-    setTrainingView('dashboard'); // Return to Dashboard
+    setTrainingView('dashboard');
     setStatsDuration('');
     setStatsCalories('');
   };
 
-  // --- Views ---
+  // --- 5. Render Helpers ---
 
-  // 1. Training View Wrapper
   const renderTrainingTab = () => {
     if (trainingView === 'dashboard') {
       return (
@@ -207,10 +246,9 @@ const App: React.FC = () => {
     return (
       <div className={`min-h-screen pb-32 relative ${bgClass}`}>
         <div className="p-6">
-          {/* Back Button */}
           <div className="mb-4 flex items-center justify-between">
             <button 
-              onClick={() => setTrainingView('dashboard')}
+              onClick={() => { triggerFeedback('light'); setTrainingView('dashboard'); }}
               className="text-slate-400 hover:text-white text-sm uppercase font-bold tracking-widest flex items-center gap-2"
             >
               <i className="fas fa-chevron-left"></i> Back to Dashboard
@@ -333,7 +371,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Bottom Dock */}
-      <TabBar current={activeTab} onSelect={setActiveTab} />
+      <TabBar current={activeTab} onSelect={handleTabSelect} />
     </div>
   );
 };
