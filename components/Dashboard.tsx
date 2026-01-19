@@ -21,7 +21,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectDay, logs, weekDates }) =
   const progressPercentage = Math.round((completedCount / 7) * 100);
 
   return (
-    <div className="p-6 pb-32 min-h-screen bg-slate-950 text-white animate-fade-in">
+    <div className="p-6 pb-40 min-h-screen bg-slate-950 text-white animate-fade-in">
       {/* Dashboard Header */}
       <div className="mb-8 flex justify-between items-start border-b border-slate-800 pb-4">
         <div>

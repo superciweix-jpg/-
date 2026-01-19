@@ -7,7 +7,7 @@ interface CoachNoteProps {
 
 const CoachNote: React.FC<CoachNoteProps> = ({ note, type = 'info' }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-950/90 backdrop-blur-md border-t border-slate-800 z-10">
+    <div className="w-full p-4 bg-slate-950/90 border-t border-slate-800">
       <div className={`
         rounded p-3 text-sm flex items-start gap-3
         ${type === 'warning' ? 'bg-orange-950/30 border border-orange-900/50 text-orange-200' : 'bg-slate-900 border border-slate-800 text-slate-300'}

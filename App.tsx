@@ -244,7 +244,7 @@ const App: React.FC = () => {
     };
 
     return (
-      <div className={`min-h-screen pb-32 relative ${bgClass}`}>
+      <div className={`min-h-screen pb-40 relative ${bgClass}`}>
         <div className="p-6">
           <div className="mb-4 flex items-center justify-between">
             <button 
