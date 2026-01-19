@@ -52,3 +52,13 @@ export interface WorkoutLog {
     };
   };
 }
+
+export interface HistoryRecord {
+  id: string;
+  date: string; // YYYY-MM-DD
+  dayName: string; // e.g., "星期一"
+  title: string; // e.g., "上肢肌肥大"
+  duration: string;
+  calories: string;
+  completedAt: number; // Timestamp for sorting
+}
