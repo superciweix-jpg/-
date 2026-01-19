@@ -8,6 +8,7 @@ interface ExerciseCardProps {
   loggedReps: string;
   onToggle: () => void;
   onInputChange: (field: 'weight' | 'reps', val: string) => void;
+  variant?: 'warmup' | 'main' | 'cooldown'; // Visual variant
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({ 
@@ -16,7 +17,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   loggedWeight,
   loggedReps, 
   onToggle, 
-  onInputChange 
+  onInputChange,
+  variant = 'main'
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -27,11 +29,16 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     return parseFloat(loggedWeight) >= parseFloat(exercise.targetWeight);
   })();
 
-  const borderColor = isDone 
-    ? 'border-emerald-900/50' 
-    : isTargetMet 
-      ? 'border-neon-green/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
-      : 'border-slate-800 hover:border-slate-700';
+  // Visual styles based on variant
+  const getBorderColor = () => {
+    if (isDone) return 'border-emerald-900/50 bg-slate-900/40 opacity-60';
+    if (variant === 'warmup') return 'border-neon-yellow/30 bg-yellow-950/10';
+    if (variant === 'cooldown') return 'border-blue-900/40 bg-blue-950/10';
+    
+    // Main lift logic
+    if (isTargetMet) return 'border-neon-green/60 shadow-[0_0_10px_rgba(16,185,129,0.2)] bg-slate-900';
+    return 'border-slate-800 hover:border-slate-700 bg-slate-900';
+  };
 
   const hasFormCheck = exercise.formCheck && exercise.formCheck.length > 0;
 
@@ -39,8 +46,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     <div 
       className={`
         relative p-4 rounded-lg border transition-all duration-300
-        ${isDone ? 'bg-slate-900/50 opacity-70' : 'bg-slate-900 shadow-lg'}
-        ${borderColor}
+        ${getBorderColor()}
       `}
     >
       <div className="flex justify-between items-start mb-2">
@@ -49,6 +55,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           onClick={() => hasFormCheck && setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center gap-2">
+            {variant === 'warmup' && <span className="text-[9px] bg-yellow-900/50 text-yellow-500 px-1 rounded uppercase border border-yellow-800">热身</span>}
+            {variant === 'cooldown' && <span className="text-[9px] bg-blue-900/50 text-blue-400 px-1 rounded uppercase border border-blue-800">冷身</span>}
+            
             <h3 className={`font-bold text-lg ${isDone ? 'text-emerald-500 line-through decoration-2' : 'text-slate-100'}`}>
               {exercise.name}
             </h3>
@@ -61,11 +70,17 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
           
           {/* Reference Badge */}
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex flex-wrap items-center gap-2 mt-1">
             <span className="text-xs text-slate-500 font-mono">计划: {exercise.sets} x {exercise.reps}</span>
             {exercise.targetWeight && (
                <span className="bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded border border-slate-700 font-mono">
                  目标: {exercise.targetWeight}kg / {exercise.targetReps}次
+               </span>
+            )}
+            {exercise.restTime && (
+               <span className="bg-slate-950 text-slate-500 text-[10px] px-1.5 py-0.5 rounded border border-slate-800 font-mono flex items-center">
+                 <i className="fas fa-hourglass-half mr-1 text-[8px]"></i>
+                 {exercise.restTime}s 休息
                </span>
             )}
           </div>

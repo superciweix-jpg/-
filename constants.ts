@@ -12,10 +12,17 @@ export const USER_PROFILE: UserProfile = {
   injuries: ["L4-L5 腰椎劳损", "C5-C6 颈椎膨出"]
 };
 
-// Logic:
-// Bench: 100kg PR -> Target ~82.5kg
-// Squat: 135kg PR -> Target ~107.5kg
-// Deadlift: 160kg PR -> Target ~135kg
+// Common Warmup/Cooldown definitions
+const WARMUP_ROUTINE = [
+  { id: "wu1", name: "肩部环绕", sets: "2", reps: "20次", notes: "大幅度绕肩，活动关节囊", restTime: "0" },
+  { id: "wu2", name: "弹力带面拉", sets: "2", reps: "15次", notes: "激活后束，轻重量", restTime: "30" },
+  { id: "wu3", name: "猫牛式", sets: "1", reps: "1分钟", notes: "脊柱分节运动，配合呼吸", restTime: "0" }
+];
+
+const COOLDOWN_ROUTINE = [
+  { id: "cd1", name: "胸大肌拉伸", sets: "1", reps: "30秒/侧", notes: "靠墙拉伸，不要过度", restTime: "0" },
+  { id: "cd2", name: "背部泡沫轴", sets: "1", reps: "1分钟", notes: "滚动胸椎段，避开腰椎", restTime: "0" }
+];
 
 export const WEEKLY_PLAN: WeeklySchedule = {
   1: { // Monday
@@ -23,6 +30,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
     focus: "上肢肌肥大 & 颈椎控制",
     theme: 'strength',
     warning: "C5-C6 重点关注",
+    warmup: WARMUP_ROUTINE,
     exercises: [
       { 
         id: "m1", 
@@ -32,6 +40,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         targetWeight: "82.5", 
         targetReps: "6", 
         notes: "与潘德勒划船组成超级组",
+        restTime: "120-180",
         formCheck: [
           "保持肩胛骨后缩下沉，保护 C5-C6 颈椎。",
           "脚掌死死抓地，创造稳定的全身张力。",
@@ -46,6 +55,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         targetWeight: "70", 
         targetReps: "8", 
         notes: "爆发力拉起，慢速下放",
+        restTime: "60-90",
         formCheck: [
           "躯干几乎与地面平行，保持腰椎中立。",
           "不要用惯性‘荡’起重量，感受背阔肌收缩。"
@@ -59,6 +69,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         targetWeight: "RPE 8", 
         targetReps: "15", 
         notes: "针对C5-C6康复。挤压后束。",
+        restTime: "60-90",
         formCheck: [
           "绳索调至眼部高度，向两侧耳朵方向拉。",
           "重点感受后三角肌挤压，不要耸肩（避免斜方肌过载）。",
@@ -73,6 +84,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         targetWeight: "自重", 
         targetReps: "45s", 
         notes: "最大张力。收紧臀部。",
+        restTime: "45-60",
         formCheck: [
           "全身极度收紧：握拳、夹紧臀部、大腿用力。",
           "想象要把手肘和脚尖往身体中间“拉”。",
@@ -80,6 +92,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         ]
       }
     ],
+    cooldown: COOLDOWN_ROUTINE,
     coachNote: "C5-C6 重点关注：收下巴，大重量组避免颈部代偿。不要在卧推时探头。"
   },
   2: { // Tuesday
@@ -87,6 +100,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
     focus: "下肢极限力量 (Max Effort)",
     theme: 'strength',
     warning: "腰椎保护协议生效",
+    warmup: [{ id: "t_wu1", name: "90/90 髋关节灵活性", sets: "1", reps: "2分钟", notes: "激活髋部" }],
     exercises: [
       { 
         id: "t1", 
@@ -95,6 +109,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         reps: "3-5", 
         targetWeight: "107.5", 
         targetReps: "5", 
+        restTime: "180-240",
         notes: "必须佩戴腰带。强制使用瓦式呼吸。",
         formCheck: [
           "核心吸气锁死（腹内压），像穿了钢盔一样。",
@@ -109,6 +124,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         reps: "3", 
         targetWeight: "135", 
         targetReps: "3", 
+        restTime: "180-240",
         notes: "保持脊柱绝对中立。禁止龟背磨次数。",
         formCheck: [
           "脊柱保持中立，严禁圆腰。",
@@ -123,9 +139,11 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         reps: "8/单腿", 
         targetWeight: "RPE 8", 
         targetReps: "8", 
+        restTime: "90",
         notes: "针对灵活性与稳定性的辅助训练。" 
       }
     ],
+    cooldown: [{ id: "t_cd1", name: "臀部拉伸", sets: "1", reps: "2分钟", notes: "鸽子式" }],
     coachNote: "腰椎保护协议：深呼吸，核心绷紧。严禁盲目冲大重量 (NO EGO LIFTING)。"
   },
   3: { // Wednesday
@@ -151,6 +169,7 @@ export const WEEKLY_PLAN: WeeklySchedule = {
     dayName: "星期五",
     focus: "核心爆发 & 神经系统激活",
     theme: 'strength',
+    warmup: [{ id: "f_wu1", name: "跳箱", sets: "3", reps: "5次", notes: "激活神经" }],
     exercises: [
       { 
         id: "f1", 
@@ -159,15 +178,17 @@ export const WEEKLY_PLAN: WeeklySchedule = {
         reps: "30米", 
         targetWeight: "RPE 9", 
         targetReps: "30m", 
+        restTime: "90-120",
         notes: "大重量。抗侧屈训练。",
         formCheck: [
           "保持躯干正直，不要因为负重而侧倾，这是锻炼深层核心稳定性的关键。",
           "沉肩，不要耸肩，像拎着两个沉重的行李箱。"
         ]
       },
-      { id: "f2", name: "帕洛夫推", sets: "3", reps: "10/单侧", targetWeight: "RPE 8", targetReps: "10", notes: "抗旋转。锁死核心。" },
-      { id: "f3", name: "跳绳", sets: "5", reps: "3分钟", targetWeight: "极速", targetReps: "3m", notes: "泰拳节奏预备。" }
+      { id: "f2", name: "帕洛夫推", sets: "3", reps: "10/单侧", targetWeight: "RPE 8", targetReps: "10", restTime: "60", notes: "抗旋转。锁死核心。" },
+      { id: "f3", name: "跳绳", sets: "5", reps: "3分钟", targetWeight: "极速", targetReps: "3m", restTime: "60", notes: "泰拳节奏预备。" }
     ],
+    cooldown: [{ id: "f_cd1", name: "小腿拉伸", sets: "1", reps: "2分钟", notes: "防抽筋" }],
     coachNote: "激活中枢神经系统 (CNS)。核心要硬，脚步要轻。"
   },
   6: { // Saturday

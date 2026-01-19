@@ -18,6 +18,7 @@ export interface Exercise {
   targetWeight?: string; // The calculated target based on PR
   targetReps?: string; // The specific target rep count
   notes?: string;
+  restTime?: string; // Suggested rest time in seconds (e.g., "120-180")
   isRest?: boolean;
   formCheck?: string[]; // Smart Form-Check instructions
 }
@@ -26,7 +27,9 @@ export interface DailyPlan {
   dayName: string;
   focus: string;
   warning?: string;
+  warmup?: Exercise[]; // New Warmup Section
   exercises: Exercise[];
+  cooldown?: Exercise[]; // New Cooldown Section
   coachNote: string;
   theme: 'strength' | 'cardio' | 'rest' | 'skill' | 'zen';
 }
@@ -38,6 +41,8 @@ export interface WeeklySchedule {
 export interface WorkoutLog {
   [date: string]: {
     completed: boolean;
+    duration?: string; // Minutes
+    calories?: string; // KCAL
     exercises: {
       [exerciseId: string]: {
         done: boolean;
